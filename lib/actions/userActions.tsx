@@ -160,9 +160,15 @@ export async function userResetPassword(
     email: validateduser.data.email,
   });
 
-  if (bcrypt.compareSync(validateduser.data.password,userregistered.password)) {
+  console.log(userregistered)
+  const value = formData.get('currentpassword');
+const currentpassword = value ? value.toString() : '';
+  // const currentpassword=formData.get('currentpassword')?.toString()==null || formData.get('currentpassword')?.toString()==undefined ?formData.get('currentpassword')?.toString():"na"
+  if (bcrypt.compareSync(currentpassword,userregistered.password)) {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(validateduser.data.password, salt);
     const usercreated = await User.findByIdAndUpdate(userregistered.id,{
-        password: validateduser.data.password 
+        password: hash
     })
     redirect(`/dashboard`);
   } else {
@@ -225,7 +231,7 @@ export const userSignIn = async (
     });
   } catch (error) {
     return {
-      message: "Current password incorrect",
+      message: "Invalid email or password",
       success:false
     };
   }

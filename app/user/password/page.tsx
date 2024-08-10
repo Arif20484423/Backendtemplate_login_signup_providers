@@ -6,6 +6,7 @@ import { redirect} from 'next/navigation';
 const page =async  () => {
     const session = await auth();
     const email=session?.user?.email
+    console.log(session)
     if(email){
         return (
 
