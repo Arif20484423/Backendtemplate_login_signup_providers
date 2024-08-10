@@ -1,9 +1,13 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Routes
+
 /user/signin -> credentials, providers
+
 /user/signup  --- email -> otp-> password set
+
 /user/password  -reset password once logged in 
+
 /dashboard --- signout button
 
 
