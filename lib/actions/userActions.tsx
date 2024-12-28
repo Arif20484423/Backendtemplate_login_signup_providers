@@ -1,6 +1,5 @@
 "use server";
-import { User } from "@/models/user";
-import { Userunverified } from "@/models/userunverified";
+import { User, Userunverified } from "@/models/user";
 import { signIn, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import z from "zod";
@@ -8,11 +7,9 @@ import nodemailer from "nodemailer";
 import bcrypt from "bcrypt-edge";
 const userValidation = z.object({
   email: z.string().email({ message: "Invalid Email" }),
-  password: z
-    .string()
-    .min(3, { message: "Password length should be greater than 3" }),
+  password: z.string().min(3, { message: "Password length should be greater than 3" }),
 });
-export type Response = {
+export type ResponseType= {
   errors?: {
     email?: string[];
     password?: string[];
@@ -22,9 +19,9 @@ export type Response = {
 };
 
 export async function userEmailOtp(
-  prevResponse: Response | undefined,
+  prevResponse: ResponseType| undefined,
   formData: FormData
-): Promise<Response | undefined> {
+): Promise<ResponseType| undefined> {
   //validate email
   const validatedemail = z
     .object({
@@ -67,13 +64,16 @@ export async function userEmailOtp(
   if (userunverified) {
     const userupdated = await Userunverified.findOneAndUpdate(
       { email: validatedemail.data.email },
-      { otp: otp,validdate:new Date(new Date().getTime()+24*60*60*1000)}
+      {
+        otp: otp,
+        validdate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+      }
     );
   } else {
     const usercreated = await Userunverified.create({
       email: validatedemail.data.email,
       otp: otp,
-      validdate:new Date(new Date().getTime()+24*60*60*1000)
+      validdate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
     });
   }
   //sending the otp to users email
@@ -89,7 +89,7 @@ export async function userEmailOtp(
 
     console.log("Message sent: %s", info.messageId);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return {
       message: "Error sending mail",
       success: false,
@@ -99,7 +99,6 @@ export async function userEmailOtp(
     message: "Otp sent",
     success: true,
   };
-
 }
 //set----------bcrypt
 export async function userRegistered(email: string) {
@@ -112,9 +111,9 @@ export async function userRegistered(email: string) {
 }
 
 export async function userSetPassword(
-  prevResponse: Response | undefined,
+  prevResponse: ResponseType| undefined,
   formData: FormData
-): Promise<Response | undefined> {
+): Promise<ResponseType| undefined> {
   const validateduser = userValidation.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -132,18 +131,18 @@ export async function userSetPassword(
     email: validateduser.data.email,
     password: hash,
   });
-  await signIn('credentials',{
-    redirect:false,
-    email:validateduser.data.email,
-    password:validateduser.data.password
-  })
-  redirect('/user/details')
+  await signIn("credentials", {
+    redirect: false,
+    email: validateduser.data.email,
+    password: validateduser.data.password,
+  });
+  redirect("/user/details");
 }
 
 export async function userResetPassword(
-  prevResponse: Response | undefined,
+  prevResponse: ResponseType| undefined,
   formData: FormData
-): Promise<Response | undefined> {
+): Promise<ResponseType| undefined> {
   const validateduser = userValidation.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -153,42 +152,42 @@ export async function userResetPassword(
     return {
       message: "Password  length should be greater than 3",
       errors: validateduser.error.flatten().fieldErrors,
-      success:false
+      success: false,
     };
   }
   const userregistered = await User.findOne({
     email: validateduser.data.email,
   });
 
-  console.log(userregistered)
-  const value = formData.get('currentpassword');
-const currentpassword = value ? value.toString() : '';
+  console.log(userregistered);
+  const value = formData.get("currentpassword");
+  const currentpassword = value ? value.toString() : "";
   // const currentpassword=formData.get('currentpassword')?.toString()==null || formData.get('currentpassword')?.toString()==undefined ?formData.get('currentpassword')?.toString():"na"
-  if (bcrypt.compareSync(currentpassword,userregistered.password)) {
+  if (bcrypt.compareSync(currentpassword, userregistered.password)) {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(validateduser.data.password, salt);
-    const usercreated = await User.findByIdAndUpdate(userregistered.id,{
-        password: hash
-    })
+    const usercreated = await User.findByIdAndUpdate(userregistered.id, {
+      password: hash,
+    });
     redirect(`/dashboard`);
   } else {
     return {
       message: "password didn't matched",
-      success:false
+      success: false,
     };
   }
 }
 //set----------bcrypt
 export async function userVerifyOtp(
-  prevResponse: Response | undefined,
+  prevResponse: ResponseType| undefined,
   formData: FormData
-): Promise<Response | undefined> {
+): Promise<ResponseType| undefined> {
   const email = formData.get("email")?.toString();
   const otp = formData.get("otp");
   const userunverified = await Userunverified.findOne({ email: email });
   if (userunverified) {
-    const d= new Date()
-    if (d<userunverified.validdate && otp == userunverified.otp) {
+    const d = new Date();
+    if (d < userunverified.validdate && otp == userunverified.otp) {
       return {
         message: "Otp verified",
         success: true,
@@ -200,15 +199,15 @@ export async function userVerifyOtp(
       };
     }
   } else {
-    console.log("nounverified")
+    console.log("nounverified");
     redirect("/user/signup");
   }
 }
 
 export const userSignIn = async (
-  prevResponse: Response | undefined,
+  prevResponse: ResponseType| undefined,
   formData: FormData
-): Promise<Response | undefined> => {
+): Promise<ResponseType| undefined> => {
   const validateduser = userValidation.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -218,7 +217,7 @@ export const userSignIn = async (
     return {
       errors: validateduser.error.flatten().fieldErrors,
       message: "Invalid email or password",
-      success:false
+      success: false,
     };
   }
 
@@ -232,23 +231,22 @@ export const userSignIn = async (
   } catch (error) {
     return {
       message: "Invalid email or password",
-      success:false
+      success: false,
     };
   }
   redirect("/dashboard");
 };
 
 export async function userSignInGoogle() {
-
-      await signIn("google");      
+  await signIn("google");
 }
-export async function userSignInGithub()  {
-    await signIn("github");
+export async function userSignInGithub() {
+  await signIn("github");
 }
 
-export async function userSignOut(){
+export async function userSignOut() {
   await signOut({
-    redirect:false
+    redirect: false,
   });
-  redirect('/')
+  redirect("/");
 }

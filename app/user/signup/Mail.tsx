@@ -2,9 +2,9 @@
 import React from 'react'
 import { userEmailOtp } from '@/lib/actions/userActions'
 import { useFormState } from 'react-dom'
-import { Response } from '@/lib/actions/userActions'
+import { ResponseType } from '@/lib/actions/userActions'
 const Mail = ({step,setStep,setEmail}:{step:number,setStep:Function,setEmail:Function}) => {
-    const initialState:Response={message:null,errors:{},success:false}
+    const initialState:ResponseType={message:null,errors:{},success:false}
   const [state,formAction] = useFormState(userEmailOtp,initialState);
   if(state?.success){
     setStep(step+1);
