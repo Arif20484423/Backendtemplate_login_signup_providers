@@ -33,7 +33,7 @@ Major error to fix -
 shift the database work of auth.ts file to api route and making fetch request resolved from
 https://stackoverflow.com/questions/78407469/the-error-was-caused-by-importing-mongoose-dist-browser-umd-js-in-src-model
 
-##Imp changes required for production
+## Imp changes required for production
 
 All fetch base url should be changed for production
 
