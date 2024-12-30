@@ -7,7 +7,7 @@ that is in Web folder backendtemplate_login_signup_providers
 
 ## Routes login/signup
 
-/user/signin -> credentials, providers
+/user/signin -> credentials, providers 
 
 /user/signup  --- email -> otp-> password set
 
@@ -17,7 +17,7 @@ that is in Web folder backendtemplate_login_signup_providers
 
 
 ## Steps and Resources
-1- Tookup my own backend login/signup template from my own github repository
+1- Started Creating backend login/signup template 
 
 2- Extended the functionalities to make autheentication return id too(some additional info to session)
 
@@ -33,7 +33,15 @@ Major error to fix -
 shift the database work of auth.ts file to api route and making fetch request resolved from
 https://stackoverflow.com/questions/78407469/the-error-was-caused-by-importing-mongoose-dist-browser-umd-js-in-src-model
 
-5- .......
+##Imp changes required for production
+
+All fetch base url should be changed for production
+
+All Providers id secret is to be changed for production and assign in production env variables
+
+Do not forget to rebuild after updating env variables in production
+
+Check env variables in .env.local in local location in my pc
 
 
 ## Getting Started
